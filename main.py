@@ -25,8 +25,12 @@ class Jugant(engine.State):
     def init(self):
         w,h = conf.mides_pantalla
         self.b = pygame.sprite.Group()
-        e = edifici.Edifici((w//2,h//2))
-        self.b.add(e)
+        e1 = edifici.Edifici((0,h//2),0)
+        x1,y1 = e1.rect.bottomright
+        e2 = edifici.Edifici((x1,y1),1)
+        x2,y2 = e2.rect.bottomright
+        e3  = edifici.Edifici((x2,y2),2)
+        self.b.add(e1,e2,e3)
     def paint(self, screen):
         self.update(screen)
     def loop(self):
