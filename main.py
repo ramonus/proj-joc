@@ -4,6 +4,7 @@ from pygame.locals import *
 from pgu import engine
 import conf
 import edifici
+from pytmx.util_pygame import load_pygame
 
 class Joc(engine.Game):
     def __init__(self):
@@ -31,6 +32,9 @@ class Jugant(engine.State):
         x2,y2 = e2.rect.bottomright
         e3  = edifici.Edifici((x2,y2),2)
         self.b.add(e1,e2,e3)
+        self.tiled_map = load_pygame("Images/til.tmx")
+        print("TM:",type(self.tiled_map))
+
     def paint(self, screen):
         self.update(screen)
     def loop(self):
