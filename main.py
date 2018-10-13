@@ -4,6 +4,7 @@ from pygame.locals import *
 from pgu import engine
 import conf
 import edifici
+from tiledmap import TiledMap
 from pytmx.util_pygame import load_pygame
 
 class Joc(engine.Game):
@@ -24,6 +25,10 @@ class Joc(engine.Game):
 
 class Jugant(engine.State):
     def init(self):
+        self.load_data()
+
+    def load_data(self):
+        """
         w,h = conf.mides_pantalla
         self.b = pygame.sprite.Group()
         e1 = edifici.Edifici((0,h//2),0)
@@ -33,7 +38,11 @@ class Jugant(engine.State):
         e3  = edifici.Edifici((x2,y2),2)
         self.b.add(e1,e2,e3)
         self.tiled_map = load_pygame("Images/til.tmx")
-        print("TM:",type(self.tiled_map))
+        """
+        self.map = TiledMap("Images/til.tmx")
+        self.map_img = self.map.make_map()
+        self.map_rect = self.map_img.get_rect()
+
 
     def paint(self, screen):
         self.update(screen)
@@ -41,7 +50,8 @@ class Jugant(engine.State):
         pass
     def update(self, screen):
         screen.fill(conf.color_fons)
-        self.b.draw(screen)
+        # self.b.draw(screen)
+        screen.blit(self.map_img, (0,0))
         pygame.display.flip()
     
 def main():

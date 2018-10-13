@@ -64,27 +64,17 @@ class Menu(engine.State):
     def canvia_etapa(self, text):
         self.transicio = text
 class Play(engine.State):
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.app = gui.App()
-
     def init(self):
-        self.final = False
-        e = gui.Button("Useless")
-        e.connect(gui.CLICK, self.atura)
-        self.app.init(widget=e)
-    def event(self, ev):
-        r1 = super().event(ev)
-        r2 = self.app.event(ev)
-        return r1 or r2
+        self.image = pygame.Surface(conf.mides_pantalla)
+        self.pos = 0,0
+        self._pos = self.pos
 
-    def loop(self):
-        super().loop()
-        if self.final:
-            return self.game.change_state()
-    def update(self, screen):
-        rects = self.app.update(screen)
-        pygame.display.update(rects)
+    def paint(self,s):
+        s.fill(conf.color_fons_play)
 
-    def atura(self, *args):
-        self.final = True
+def main():
+    game = JocMenu()
+    game.run()
+
+if __name__=="__main__":
+    main()
