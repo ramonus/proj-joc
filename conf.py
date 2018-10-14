@@ -1,5 +1,5 @@
 fps = 30
-mides_pantalla = (500,500)
+mides_pantalla = (480,480)
 
 tile_size = (16,16)
 margin = 1

@@ -9,7 +9,7 @@ class Scroller(pygame.sprite.Sprite):
     def update(self):
         self.finestra.left += 1
         if self.finestra.right > self.imatge_gran.get_width():
-            self.finestra.left = 
+            self.finestra.left = 0
             self.image = self.imatge_gran.subsurface(self.finestra)
 
 def amplia(imatge, amplada):

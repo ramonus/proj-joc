@@ -7,6 +7,8 @@ import edifici
 from tiledmap import TiledMap
 from pytmx.util_pygame import load_pygame
 
+from scroll import Scroller
+
 class Joc(engine.Game):
     def __init__(self):
         super().__init__()
