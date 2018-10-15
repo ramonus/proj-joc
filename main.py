@@ -42,18 +42,34 @@ class Jugant(engine.State):
         self.tiled_map = load_pygame("Images/til.tmx")
         """
         self.map = TiledMap("Images/til.tmx")
-        self.map_img = self.map.make_map()
-        self.map_rect = self.map_img.get_rect()
 
 
     def paint(self, screen):
         self.update(screen)
+    def event(self,evt):
+        if evt.type == pygame.KEYDOWN:
+            k = evt.key
+            if k==pygame.K_w:
+                self.map.set_vel_y(-1)
+            elif k==pygame.K_s:
+                self.map.set_vel_y(1)
+            elif k==pygame.K_a:
+                self.map.set_vel_x(-1)
+            elif k==pygame.K_d:
+                self.map.set_vel_x(1)
+        if evt.type == pygame.KEYUP:
+            k = evt.key
+            if k==pygame.K_w or k==pygame.K_s:
+                self.map.set_vel_y(0)
+            elif k==pygame.K_a or k==pygame.K_d:
+                self.map.set_vel_x(0)
+
     def loop(self):
-        pass
+        self.map.update()
     def update(self, screen):
         screen.fill(conf.color_fons)
         # self.b.draw(screen)
-        screen.blit(self.map_img, (0,0))
+        screen.blit(self.map.image, (0,0))
         pygame.display.flip()
     
 def main():
