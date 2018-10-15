@@ -5,3 +5,7 @@ tile_size = (16,16)
 margin = 1
 color_fons = (100,100,100)
 color_fons_menu = (100,100,255)
+
+# Zombie
+mides_zombie_raw = (128,128)
+imatge_zombie = "Images/zombie.png"

@@ -34,7 +34,6 @@ class TiledMap:
             print("Not fitting")
             i+=1
             self._adjust_camera()
-        print(self.camera)
         self.image = self.big_image.subsurface(self.camera)
     def _adjust_camera(self):
         l,t = self.camera.topleft

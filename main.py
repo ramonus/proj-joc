@@ -7,7 +7,7 @@ import edifici
 from tiledmap import TiledMap
 from pytmx.util_pygame import load_pygame
 
-from scroll import Scroller
+import zombie
 
 class Joc(engine.Game):
     def __init__(self):
@@ -42,6 +42,9 @@ class Jugant(engine.State):
         self.tiled_map = load_pygame("Images/til.tmx")
         """
         self.map = TiledMap("Images/til.tmx")
+        self.zombies = pygame.sprite.Group()
+        z1 = zombie.Zombie((50,50))
+        self.zombies.add(z1)
 
 
     def paint(self, screen):
@@ -57,7 +60,7 @@ class Jugant(engine.State):
                 self.map.set_vel_x(-1)
             elif k==pygame.K_d:
                 self.map.set_vel_x(1)
-        if evt.type == pygame.KEYUP:
+        elif evt.type == pygame.KEYUP:
             k = evt.key
             if k==pygame.K_w or k==pygame.K_s:
                 self.map.set_vel_y(0)
@@ -66,10 +69,12 @@ class Jugant(engine.State):
 
     def loop(self):
         self.map.update()
+        self.zombies.update()
     def update(self, screen):
         screen.fill(conf.color_fons)
         # self.b.draw(screen)
         screen.blit(self.map.image, (0,0))
+        self.zombies.draw(screen)
         pygame.display.flip()
     
 def main():
