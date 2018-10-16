@@ -1,26 +1,37 @@
 import pygame
 from pygame.locals import *
 
-from pgu import engine
+from pgu import engine, gui
 import conf
-import edifici
 from tiledmap import TiledMap
-from pytmx.util_pygame import load_pygame
+from pytmx import TiledObjectGroup
 
-import zombie
+import zombie, champ
 
 class Joc(engine.Game):
     def __init__(self):
         super().__init__()
-        self.screen = pygame.display.set_mode(conf.mides_pantalla, SWSURFACE)
+        self.screen = pygame.display.set_mode(conf.mides_pantalla_zoom, SWSURFACE)
         self.crono = pygame.time.Clock()
         self._init_state_machine()
 
     def _init_state_machine(self):
         self.jugant = Jugant(self)
+        self.menu = Menu(self)
 
     def run(self):
-        super().run(self.jugant, self.screen)
+        super().run(self.menu, self.screen)
+    
+    def change_state(self, transicio=None):
+        if self.state is self.menu:
+            if transicio == "Jugar":
+                new_state = self.jugant
+                self.jugant.init()
+            else:
+                raise ValueError("Transició desconeguda:",transicio)
+        else:
+            raise ValueError("Estat desconegut:",self.state)
+        return new_state
 
     def tick(self):
         self.crono.tick(conf.fps)
@@ -30,21 +41,11 @@ class Jugant(engine.State):
         self.load_data()
 
     def load_data(self):
-        """
-        w,h = conf.mides_pantalla
-        self.b = pygame.sprite.Group()
-        e1 = edifici.Edifici((0,h//2),0)
-        x1,y1 = e1.rect.bottomright
-        e2 = edifici.Edifici((x1,y1),1)
-        x2,y2 = e2.rect.bottomright
-        e3  = edifici.Edifici((x2,y2),2)
-        self.b.add(e1,e2,e3)
-        self.tiled_map = load_pygame("Images/til.tmx")
-        """
         self.map = TiledMap("Images/til.tmx")
-        self.zombies = pygame.sprite.Group()
-        z1 = zombie.Zombie((50,50))
-        self.zombies.add(z1)
+        self.gchamp = pygame.sprite.Group()
+        self.champ = champ.Champ((100,100))
+        self.gchamp.add(self.champ)
+        self.pressed_keys = []
 
 
     def paint(self, screen):
@@ -52,31 +53,101 @@ class Jugant(engine.State):
     def event(self,evt):
         if evt.type == pygame.KEYDOWN:
             k = evt.key
-            if k==pygame.K_w:
-                self.map.set_vel_y(-1)
-            elif k==pygame.K_s:
-                self.map.set_vel_y(1)
-            elif k==pygame.K_a:
-                self.map.set_vel_x(-1)
-            elif k==pygame.K_d:
-                self.map.set_vel_x(1)
+            if k in self.pressed_keys:
+                del self.pressed_keys[self.pressed_keys.index(k)]
+            self.pressed_keys.append(k)
+            if k == pygame.K_x:
+                self.pressed_keys = []
         elif evt.type == pygame.KEYUP:
             k = evt.key
-            if k==pygame.K_w or k==pygame.K_s:
-                self.map.set_vel_y(0)
-            elif k==pygame.K_a or k==pygame.K_d:
-                self.map.set_vel_x(0)
+            if k in self.pressed_keys:
+                del self.pressed_keys[self.pressed_keys.index(k)]
+        if len(self.pressed_keys)>0:
+            lk = list(self.pressed_keys)[-1]
+            if lk==pygame.K_w:
+                self.map.canviar_dir(self.map.AMUNT)
+                self.champ.dir = self.champ.AMUNT
+                self.champ.mov = True
+            elif lk==pygame.K_s:
+                self.map.canviar_dir(self.map.AVALL)
+                self.champ.dir = self.champ.AVALL
+                self.champ.mov = True
+            elif lk==pygame.K_a:
+                self.map.canviar_dir(self.map.ESQUERRA)
+                self.champ.dir = self.champ.ESQUERRA
+                self.champ.mov = True
+            elif lk==pygame.K_d:
+                self.map.canviar_dir(self.map.DRETA)
+                self.champ.dir = self.champ.DRETA
+                self.champ.mov = True
+        else:
+            self.map.canviar_dir(4)
+            self.champ.mov = False
 
     def loop(self):
         self.map.update()
-        self.zombies.update()
+        self.gchamp.update()
+        self._avoidCollisions()
     def update(self, screen):
-        screen.fill(conf.color_fons)
-        # self.b.draw(screen)
-        screen.blit(self.map.image, (0,0))
-        self.zombies.draw(screen)
+        sur = pygame.Surface(conf.mides_pantalla)
+        sur.fill(conf.color_fons)
+        sur.blit(self.map.image, (0,0))
+        self.gchamp.draw(sur)
+        sur = pygame.transform.scale(sur, conf.mides_pantalla_zoom)
+        screen.blit(sur,sur.get_rect())
         pygame.display.flip()
-    
+    def _avoidCollisions(self):
+        prect = self.champ.rect.copy()
+        prect.center = self.map.camera.center
+        for layer in self.map.tmxdata.visible_layers:
+            if isinstance(layer, TiledObjectGroup):
+                if layer.name == "buildings":
+                    for obj in layer:
+                        r = pygame.Rect(obj.x,obj.y,obj.width,obj.height)
+                        if r.colliderect(prect):
+                            print("Colliding, obj dim:",(r.left,r.top,r.width,r.height), "and prect:",prect)
+                            if r.top < prect.bottom and self.champ.dir==self.champ.AVALL:
+                                self.map.move((0,r.top-prect.bottom))
+                            elif r.bottom > prect.top and self.champ.dir==self.champ.AMUNT:
+                                self.map.move((0,r.bottom-prect.top))
+                            elif r.right > prect.left and self.champ.dir==self.champ.ESQUERRA:
+                                self.map.move((r.right-prect.left,0))
+                            elif r.left < prect.right and self.champ.dir==self.champ.DRETA:
+                                self.map.move((r.left-prect.right,0))
+class Menu(engine.State):
+    def __init__(self, *args):
+        super().__init__(*args)
+        # gui
+        self.app = gui.App()
+    def init(self):
+        self.transicio = ''
+        t = gui.Table()
+        for text in ["Jugar"]:
+            b = gui.Button(text,width=conf.menu_button_size[0],height=conf.menu_button_size[1])
+            b.connect(gui.CLICK, self.canvia_etapa, text)
+            t.td(b)
+            t.tr()
+        self.app.init(widget=t)
+
+    def paint(self, screen):
+        screen.fill(conf.color_fons_menu)
+        self.update(screen)
+
+    def event(self, ev):
+        r1 = super().event(ev)
+        r2 = self.app.event(ev)
+        return r1 or r2
+    def loop(self):
+        super().loop()
+        if self.transicio != '':
+            return self.game.change_state(self.transicio)
+    def update(self, screen):
+        super().update(screen)
+        self.app.update(screen)
+        pygame.display.flip()
+
+    def canvia_etapa(self,text):
+        self.transicio = text
 def main():
     game = Joc()
     game.run()
