@@ -49,7 +49,7 @@ class Champ2(pygame.sprite.Sprite):
         super().__init__()
         im = pygame.image.load(conf.imatge_champ).convert_alpha()
         mat_imatges = sprites.crea_matriu_imatges(im, conf.mides_champ_raw)
-        print(np.array(mat_imatges).shape)
+        self.alpha = 3
         if escalar:
             mat_imatges = self._escalar_matriu(mat_imatges,escalar)
         self.carregar_imatges(mat_imatges)
@@ -73,11 +73,11 @@ class Champ2(pygame.sprite.Sprite):
                 nm[i][j] = pygame.transform.scale(nm[i][j],nova_mida)
         return nm
     def _carregarImatge(self):
-        return self.llista_im[self.dir][self.count//5]
+        return self.llista_im[self.dir][self.count//self.alpha]
     def update(self):
         if self.mov:
             self.count = self.count +1
-            if self.count >= len(self.llista_im[self.dir])*5:
+            if self.count >= len(self.llista_im[self.dir])*self.alpha:
                 self.count = 0
         else:
             self.count = 0

@@ -7,6 +7,8 @@ from tiledmap import TiledMap
 from pytmx import TiledObjectGroup
 import numpy as np
 import champs
+from PIL import Image
+from pathfinder import PathFinder
 
 class Joc(engine.Game):
     def __init__(self):
@@ -42,6 +44,12 @@ class Jugant(engine.State):
 
     def load_data(self):
         self.map = TiledMap("Images/til.tmx")
+        self.pf = PathFinder(self.map)
+        ma = self.pf.get_matrix_map()
+        im = Image.fromarray(ma*255)
+        im = im.resize(np.multiply(im.size,10))
+        im.show()
+
         self.gchamp = pygame.sprite.Group()
         self.champ = champs.Champ2(np.true_divide(self.map.camera.size,2),conf.mides_champ)
         self.gchamp.add(self.champ)

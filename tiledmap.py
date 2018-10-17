@@ -10,7 +10,7 @@ class TiledMap:
         self.height = tm.height * tm.tileheight
         self.tmxdata = tm
         self.camera = pygame.Rect((0,0),conf.mides_pantalla)
-        self.vel_module = 2
+        self.vel_module = 5
         self.vel = (0,0)
         self.mam = np.subtract(np.add((self.width,self.height),self.camera.size),conf.mides_champ).astype(int)
         self.initpos = np.subtract(np.floor_divide(conf.mides_pantalla,2),np.floor_divide(conf.mides_champ,2)).astype(int)
@@ -58,18 +58,24 @@ class TiledMap:
         l,t = self.camera.topleft
         r,b = self.camera.bottomright
         x,y = self.vel
+        print(self.camera)
         if t < 0:
             self.vel = (x,0)
             self.camera.top = 0
+            print("Set vel to:",self.vel,"and top to: 0")
         if l < 0:
             self.vel = (0,y)
             self.camera.left = 0
-        if b > self.height:
+            print("Set vel to:",self.vel,"and left to: 0")
+        if b > self.bir.height:
             self.vel = (x,0)
             self.camera.bottom = self.bir.height
-        if r > self.width:
+            print("Set vel to:",self.vel,"and bottom to:",self.bir.height)
+        if r > self.bir.width:
             self.vel = (0, y)
-            self.camera.right = self.bir.width
+            self.camera.right = self.bir.right
+            print("Set vel to:",self.vel,"and right to:",self.bir.right)
+        print(self.camera)
     def make_map(self):
         temp_surface = pygame.Surface((self.width,self.height))
         temp_surface.fill(conf.color_fons)
