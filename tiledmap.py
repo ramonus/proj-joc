@@ -1,7 +1,7 @@
 import pygame
 import pytmx
 import conf
-
+import numpy as np
 class TiledMap:
     AMUNT,AVALL,DRETA,ESQUERRA,STOP = range(5)
     def __init__(self, fn):
@@ -12,10 +12,15 @@ class TiledMap:
         self.camera = pygame.Rect((0,0),conf.mides_pantalla)
         self.vel_module = 2
         self.vel = (0,0)
+        self.mam = np.subtract(np.add((self.width,self.height),self.camera.size),conf.mides_champ).astype(int)
+        self.initpos = np.subtract(np.floor_divide(conf.mides_pantalla,2),np.floor_divide(conf.mides_champ,2)).astype(int)
         self.big_image = self.make_map()
         self.bir = self.big_image.get_rect()
-        self.camera.topright = self.bir.topright
+        self.camera.center = self.initpos[0]+self.bir.width//2,self.initpos[1]+self.bir.width//4
+        self.champ = pygame.Rect((0,0),conf.mides_champ)
+        self.champ.center = self.camera.center
         self.image = self.big_image.subsurface(self.camera)
+
     def render(self, surface):
         ti = self.tmxdata.get_tile_image_by_gid
         for layer in self.tmxdata.visible_layers:
@@ -61,11 +66,15 @@ class TiledMap:
             self.camera.left = 0
         if b > self.height:
             self.vel = (x,0)
-            self.camera.bottom = self.height
+            self.camera.bottom = self.bir.height
         if r > self.width:
             self.vel = (0, y)
-            self.camera.right = self.width
+            self.camera.right = self.bir.width
     def make_map(self):
         temp_surface = pygame.Surface((self.width,self.height))
+        temp_surface.fill(conf.color_fons)
         self.render(temp_surface)
-        return temp_surface
+        bs = pygame.Surface(self.mam)
+        bs.fill(conf.color_fons)
+        bs.blit(temp_surface,self.initpos)
+        return bs

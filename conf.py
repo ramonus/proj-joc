@@ -11,6 +11,19 @@ menu_button_size = (100,60)
 mides_zombie_raw = (128,128)
 imatge_zombie = "Images/zombie.png"
 
-# Champ
-imatge_champ = "Images/champ.png"
-mides_champ_raw = 48,64
+# Champs
+
+# blackbone
+# imatge_champ = "Images/champ.png"
+# mides_champ_raw = (48,64)
+# mides_champ = (24,32)
+
+# scottish
+# imatge_champ = "Images/scottish.png"
+# mides_champ_raw = (32,48)
+# mides_champ = (32,48)
+
+# hulk
+imatge_champ = "Images/hulk.png"
+mides_champ_raw = (40,56)
+mides_champ = (20,28)

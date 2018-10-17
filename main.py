@@ -5,8 +5,8 @@ from pgu import engine, gui
 import conf
 from tiledmap import TiledMap
 from pytmx import TiledObjectGroup
-
-import zombie, champ
+import numpy as np
+import champs
 
 class Joc(engine.Game):
     def __init__(self):
@@ -43,7 +43,7 @@ class Jugant(engine.State):
     def load_data(self):
         self.map = TiledMap("Images/til.tmx")
         self.gchamp = pygame.sprite.Group()
-        self.champ = champ.Champ((100,100))
+        self.champ = champs.Champ2(np.true_divide(self.map.camera.size,2),conf.mides_champ)
         self.gchamp.add(self.champ)
         self.pressed_keys = []
 
@@ -98,12 +98,12 @@ class Jugant(engine.State):
         pygame.display.flip()
     def _avoidCollisions(self):
         prect = self.champ.rect.copy()
-        prect.center = self.map.camera.center
+        prect = prect.move(self.map.camera.topleft)
         for layer in self.map.tmxdata.visible_layers:
             if isinstance(layer, TiledObjectGroup):
                 if layer.name == "buildings":
                     for obj in layer:
-                        r = pygame.Rect(obj.x,obj.y,obj.width,obj.height)
+                        r = pygame.Rect(np.add((obj.x,obj.y),self.map.initpos),(obj.width,obj.height))
                         if r.colliderect(prect):
                             print("Colliding, obj dim:",(r.left,r.top,r.width,r.height), "and prect:",prect)
                             if r.top < prect.bottom and self.champ.dir==self.champ.AVALL:
