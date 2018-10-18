@@ -10,13 +10,14 @@ class TiledMap:
         self.height = tm.height * tm.tileheight
         self.tmxdata = tm
         self.camera = pygame.Rect((0,0),conf.mides_pantalla)
+        self.matrix_map = self.get_matrix_map()
         self.vel_module = 5
         self.vel = (0,0)
         self.mam = np.subtract(np.add((self.width,self.height),self.camera.size),conf.mides_champ).astype(int)
         self.initpos = np.subtract(np.floor_divide(conf.mides_pantalla,2),np.floor_divide(conf.mides_champ,2)).astype(int)
         self.big_image = self.make_map()
         self.bir = self.big_image.get_rect()
-        self.camera.center = self.initpos[0]+self.bir.width//2,self.initpos[1]+self.bir.width//4
+        self.camera.center = self.bir.width//2,self.initpos[1]+self.bir.height//4
         self.champ = pygame.Rect((0,0),conf.mides_champ)
         self.champ.center = self.camera.center
         self.image = self.big_image.subsurface(self.camera)
@@ -84,3 +85,25 @@ class TiledMap:
         bs.fill(conf.color_fons)
         bs.blit(temp_surface,self.initpos)
         return bs
+    def get_matrix_map(self):
+        ncols = self.tmxdata.width
+        nfils = self.tmxdata.height
+        mat = [[] for i in range(nfils)]
+        objs = self._get_obj()
+        for fila in range(nfils):
+            for columna in range(ncols):
+                r1 = pygame.Rect(np.multiply((columna,fila),conf.tile_size),conf.tile_size)
+                collide = False
+                for obj in objs:
+                    r2 = pygame.Rect((obj.x,obj.y),(obj.width,obj.height))
+                    c = r1.colliderect(r2)
+                    if c:
+                        collide = True
+                        break
+                mat[fila].append(int(collide))
+        return np.array(mat,dtype=int)
+    def _get_obj(self):
+        for layer in self.tmxdata.visible_layers:
+            if isinstance(layer, pytmx.TiledObjectGroup):
+                if layer.name == "buildings":
+                    return [i for i in layer]

@@ -9,6 +9,7 @@ menu_button_size = (100,60)
 
 # Zombie
 mides_zombie_raw = (128,128)
+mides_zombie = (16,16)
 imatge_zombie = "Images/zombie.png"
 
 # Champs
