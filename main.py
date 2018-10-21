@@ -52,6 +52,7 @@ class Jugant(engine.State):
         self.pressed_keys = []
         self.npcs = pygame.sprite.Group()
         self.z1 = zombie.Zombie(np.multiply(conf.tile_size,2))
+        
 
 
     def paint(self, screen):
@@ -105,18 +106,18 @@ class Jugant(engine.State):
     def _avoidCollisions(self):
         prect = self.champ.rect.copy()
         prect = prect.move(self.map.camera.topleft)
-            for obj in self.map._get_obj():
-                r = pygame.Rect(np.add((obj.x,obj.y),self.map.initpos),(obj.width,obj.height))
-                if r.colliderect(prect):
-                    print("Colliding, obj dim:",(r.left,r.top,r.width,r.height), "and prect:",prect)
-                    if r.top < prect.bottom and self.champ.dir==self.champ.AVALL:
-                        self.map.move((0,r.top-prect.bottom))
-                    elif r.bottom > prect.top and self.champ.dir==self.champ.AMUNT:
-                        self.map.move((0,r.bottom-prect.top))
-                    elif r.right > prect.left and self.champ.dir==self.champ.ESQUERRA:
-                        self.map.move((r.right-prect.left,0))
-                    elif r.left < prect.right and self.champ.dir==self.champ.DRETA:
-                        self.map.move((r.left-prect.right,0))
+        for obj in self.map._get_obj():
+            r = pygame.Rect(np.add((obj.x,obj.y),self.map.initpos),(obj.width,obj.height))
+            if r.colliderect(prect):
+                print("Colliding, obj dim:",(r.left,r.top,r.width,r.height), "and prect:",prect)
+                if r.top < prect.bottom and self.champ.dir==self.champ.AVALL:
+                    self.map.move((0,r.top-prect.bottom))
+                elif r.bottom > prect.top and self.champ.dir==self.champ.AMUNT:
+                    self.map.move((0,r.bottom-prect.top))
+                elif r.right > prect.left and self.champ.dir==self.champ.ESQUERRA:
+                    self.map.move((r.right-prect.left,0))
+                elif r.left < prect.right and self.champ.dir==self.champ.DRETA:
+                    self.map.move((r.left-prect.right,0))
 class Menu(engine.State):
     def __init__(self, *args):
         super().__init__(*args)

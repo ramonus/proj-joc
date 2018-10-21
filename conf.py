@@ -1,6 +1,6 @@
 fps = 30
-mides_pantalla = 150,100
-mides_pantalla_zoom = (1200,800)
+mides_pantalla = 200,150
+mides_pantalla_zoom = (1000,750)
 tile_size = (16,16)
 margin = 1
 color_fons = (0,0,0)
@@ -27,4 +27,4 @@ imatge_zombie = "Images/zombie.png"
 # hulk
 imatge_champ = "Images/hulk.png"
 mides_champ_raw = (40,56)
-mides_champ = (10,14)
+mides_champ = (20,24)
