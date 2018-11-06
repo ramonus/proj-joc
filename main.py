@@ -7,7 +7,6 @@ from tiledmap import TiledMap
 from pytmx import TiledObjectGroup
 import numpy as np
 import champs
-from PIL import Image
 from pathfinder import PathFinder
 import zombie
 
