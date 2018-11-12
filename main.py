@@ -1,8 +1,8 @@
 import pygame
 from pygame.locals import *
 from pgu import engine
-from Jugant import Jugant
-from Menu import Menu
+from Jugant import Jugant   # Carreguem la classe Jugant del fitxer Jugant.py
+from Menu import Menu       # Carreguem la classe Menu del fitxer Menu.py
 import conf # Carreguem l'arxiu conf.py per a la configuració local
 
 class Joc(engine.Game): # Creem la classe Joc
