@@ -9,6 +9,7 @@ import numpy as np
 import champs
 from pathfinder import PathFinder
 import zombie
+from pausa import Pausa
 
 class Joc(engine.Game):
     def __init__(self):
@@ -20,17 +21,29 @@ class Joc(engine.Game):
     def _init_state_machine(self):
         self.jugant = Jugant(self)
         self.menu = Menu(self)
+        self.pausa = Pausa(self)
 
     def run(self):
         super().run(self.menu, self.screen)
     
     def change_state(self, transicio=None):
+        print("Canviant a:",transicio)
         if self.state is self.menu:
             if transicio == "Jugar":
                 new_state = self.jugant
                 self.jugant.init()
             else:
                 raise ValueError("Transició desconeguda:",transicio)
+        elif self.state == self.jugant:
+            if transicio=="Pausa":
+                new_state = self.pausa
+                self.pausa.init()
+        elif self.state == self.pausa:
+            if transicio=="Continuar":
+                new_state = self.jugant
+            elif transicio=="Menu":
+                new_state = self.menu
+                self.menu.init()
         else:
             raise ValueError("Estat desconegut:",self.state)
         return new_state
@@ -44,6 +57,7 @@ class Jugant(engine.State):
 
     def load_data(self):
         self.map = TiledMap("Images/til.tmx")
+        self.transicio = ''
         self.pf = PathFinder(self.map)
         self.gchamp = pygame.sprite.Group()
         self.champ = champs.Champ2(np.true_divide(self.map.camera.size,2),conf.mides_champ)
@@ -64,6 +78,9 @@ class Jugant(engine.State):
             self.pressed_keys.append(k)
             if k == pygame.K_x:
                 self.pressed_keys = []
+            if k==pygame.K_p:
+                self.pressed_keys = []
+                self.canvia_etapa("Pausa")
         elif evt.type == pygame.KEYUP:
             k = evt.key
             if k in self.pressed_keys:
@@ -94,6 +111,10 @@ class Jugant(engine.State):
         self.map.update()
         self.gchamp.update()
         self._avoidCollisions()
+        if self.transicio!='':
+            estat = self.game.change_state(self.transicio)
+            self.transicio = ''
+            return estat
     def update(self, screen):
         sur = pygame.Surface(conf.mides_pantalla)
         sur.fill(conf.color_fons)
@@ -102,6 +123,8 @@ class Jugant(engine.State):
         sur = pygame.transform.scale(sur, conf.mides_pantalla_zoom)
         screen.blit(sur,sur.get_rect())
         pygame.display.flip()
+    def canvia_etapa(self, transicio):
+        self.transicio = transicio
     def _avoidCollisions(self):
         prect = self.champ.rect.copy()
         prect = prect.move(self.map.camera.topleft)

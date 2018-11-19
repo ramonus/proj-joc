@@ -7,6 +7,8 @@ color_fons = (0,0,0)
 color_fons_menu = (100,100,255)
 menu_button_size = (100,60)
 
+color_fons_pausa = (125,200,50)
+
 # Zombie
 mides_zombie_raw = (128,128)
 mides_zombie = (16,16)
